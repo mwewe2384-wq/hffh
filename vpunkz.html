@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VersePunkz - On-Chain NFT Minting & Burning</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://unpkg.com/web3modal@1.9.12/dist/index.js"></script>
+    <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+
+    <style>
+        body {
+            background-color: #708090; /* SlateGray */
+            font-family: 'VT323', monospace;
+            color: #00ffcc;
+            image-rendering: pixelated;
+        }
+        .cyber-border {
+            border: 4px solid #00ffcc;
+            box-shadow: 4px 4px 0px #000;
+        }
+        .btn-3d {
+            position: relative;
+            background: #ff0055;
+            color: #fff;
+            border: 3px solid #000;
+            box-shadow: 0 6px 0 #000;
+            transition: all 0.1s ease;
+            cursor: pointer;
+        }
+        .btn-3d:active {
+            box-shadow: 0 2px 0 #000;
+            transform: translateY(4px);
+        }
+        .btn-connect {
+            background: #00ffcc;
+            color: #000;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+        }
+        @media (max-width: 640px) {
+            .gallery-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <nav class="max-w-6xl mx-auto flex flex-wrap justify-between items-center p-4 cyber-border bg-black mb-8">
+        <h1 class="text-4xl tracking-wider">VERSE PUNKZ</h1>
+        <button id="connectBtn" class="btn-3d btn-connect text-2xl px-6 py-1" onclick="connectWallet()">CONNECT WALLET</button>
+    </nav>
+
+    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <div class="flex flex-col gap-8">
+            
+            <section class="p-6 bg-black cyber-border text-center">
+                <h2 class="text-4xl mb-2 text-white">PUBLIC MINT IS LIVE</h2>
+                <p class="text-2xl text-yellow-400 mb-4">1ST MINT IS TOTALLY FREE PER WALLET</p>
+                
+                <div class="text-3xl mb-6">
+                    MINTED: <span id="supplyCounter" class="text-white">LOADING...</span> / 10000
+                </div>
+
+                <div class="flex justify-center items-center gap-4 mb-6 text-3xl">
+                    <button class="btn-3d px-4 py-1" onclick="updateQty(-1)">-</button>
+                    <span id="mintQty" class="text-white px-4">1</span>
+                    <button class="btn-3d px-4 py-1" onclick="updateQty(1)">+</button>
+                </div>
+
+                <button class="btn-3d text-3xl w-full py-2" onclick="mintNFT()">MINT NOW</button>
+                <div class="text-xl mt-2 text-gray-400">PRICE AFTER FREE MINT: 0.0002 ETH</div>
+            </section>
+
+            <section class="p-6 bg-black cyber-border">
+                <h2 class="text-4xl text-center mb-4 text-white">BURN TO CLAIM TOKENS</h2>
+                <p class="text-2xl text-center text-gray-400 mb-6">BURN YOUR VERSE PUNKZ TO EARN FUTURE $VPUNKZ REWARDS</p>
+                
+                <div class="flex flex-col gap-4">
+                    <input type="number" id="burnIdInput" placeholder="ENTER NFT TOKEN ID" class="bg-gray-900 border-2 border-red-500 p-2 text-2xl text-white outline-none text-center">
+                    <button class="btn-3d bg-red-600 text-3xl py-2" onclick="burnNFT()">BURN NFT</button>
+                </div>
+
+                <div class="mt-6 p-4 border-2 border-dashed border-gray-600 text-center">
+                    <button class="w-full text-2xl text-gray-500 cursor-not-allowed py-2" disabled>CLAIM $VPUNKZ (COMING SOON)</button>
+                </div>
+            </section>
+        </div>
+
+        <div class="flex flex-col gap-8">
+            
+            <section class="p-6 bg-black cyber-border flex-1">
+                <h2 class="text-4xl mb-4 text-white">COLLECTION GALLERY</h2>
+                <div id="galleryContainer" class="gallery-grid max-h-[450px] overflow-y-auto p-2 border-2 border-gray-800">
+                    </div>
+            </section>
+        </div>
+    </main>
+
+    <section class="max-w-6xl mx-auto mt-8 p-6 bg-black cyber-border">
+        <h2 class="text-4xl text-center mb-6 text-white">PROJECT ROADMAP</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xl">
+            <div class="p-4 border border-gray-800">
+                <div class="text-yellow-400 mb-2">STAGE 1</div>
+                <div>Smart contract deployment and structural testing on mainnet.</div>
+            </div>
+            <div class="p-4 border border-gray-800">
+                <div class="text-yellow-400 mb-2">STAGE 2</div>
+                <div>Launch of the public minting portal with free allowance system.</div>
+            </div>
+            <div class="p-4 border border-gray-800">
+                <div class="text-yellow-400 mb-2">STAGE 3</div>
+                <div>Activation of the burning engine for active community collectors.</div>
+            </div>
+            <div class="p-4 border border-gray-800">
+                <div class="text-yellow-400 mb-2">STAGE 4</div>
+                <div>Snapshot data processing and launch of $VPUNKZ liquidity token distribution.</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const contractAddress = "0x4B59F5Ca4bE16B14826D93f582a23f51011ADB99";
+        const alchemyUrl = "https://eth-mainnet.g.alchemy.com/v2/Jei0hdBnB76TsRhZsnx4e";
+        
+        // Contract Minimal ABI compiled from Abi.txt
+        const contractABI = [
+            {"inputs":[{"internalType":"uint256","name":"quantity","type":"uint256"}],"name":"mint","outputs":[],"stateMutability":"payable","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"burn","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"claimedFree","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}
+        ];
+
+        let provider, signer, nftContract;
+
+        function init() {
+            updateSupply();
+            loadGallery();
+            setInterval(updateSupply, 5000); // Poll supply data safely every 5 seconds
+        }
+
+        // Web3 Connection Management (Multi-Wallet Extension Support Setup)
+        async function connectWallet() {
+            // Priority list of various injected EIP-1193 Web3 providers
+            let injectedProvider = null;
+
+            if (window.ethereum) {
+                if (window.ethereum.providers && window.ethereum.providers.length > 0) {
+                    // Safe fallback routing to read whatever active extensions user interacts with first
+                    injectedProvider = window.ethereum.providers[0];
+                } else {
+                    injectedProvider = window.ethereum;
+                }
+            } else if (window.okxwallet) {
+                // Route directly to OKX Wallet extension
+                injectedProvider = window.okxwallet;
+            } else if (window.phantom && window.phantom.ethereum) {
+                // Route directly to Phantom extension
+                injectedProvider = window.phantom.ethereum;
+            } else if (window.keplr && window.keplr.ethereum) {
+                // Route to Keplr EVM layer fallback if activated
+                injectedProvider = window.keplr.ethereum;
+            }
+
+            if (!injectedProvider) {
+                alert("No compatible Web3 wallet extension found!");
+                return;
+            }
+
+            try {
+                // Request account access from the correctly routed wallet extension
+                await injectedProvider.request({ method: 'eth_requestAccounts' });
+                
+                provider = new ethers.providers.Web3Provider(injectedProvider);
+                signer = provider.getSigner();
+                nftContract = new ethers.Contract(contractAddress, contractABI, signer);
+                
+                const address = await signer.getAddress();
+                document.getElementById("connectBtn").innerText = address.substring(0,6) + "..." + address.substring(38);
+            } catch(e) {
+                console.error("Wallet connection error:", e);
+            }
+        }
+
+        async function updateSupply() {
+            try {
+                const tempProvider = new ethers.providers.JsonRpcProvider(alchemyUrl);
+                const tempContract = new ethers.Contract(contractAddress, contractABI, tempProvider);
+                const supply = await tempContract.totalSupply();
+                document.getElementById("supplyCounter").innerText = supply.toString();
+            } catch (e) {
+                console.error("Error reading supply data:", e);
+            }
+        }
+
+        function updateQty(val) {
+            let qty = parseInt(document.getElementById("mintQty").innerText);
+            qty += val;
+            if(qty < 1) qty = 1;
+            if(qty > 50) qty = 50; // Safety capping
+            document.getElementById("mintQty").innerText = qty;
+        }
+
+        async function mintNFT() {
+            if (!nftContract) return alert("Please connect wallet first!");
+            try {
+                const qty = parseInt(document.getElementById("mintQty").innerText);
+                const userAddress = await signer.getAddress();
+                const hasClaimedFree = await nftContract.claimedFree(userAddress);
+                
+                let finalPrice = ethers.utils.parseEther("0.0");
+                if (hasClaimedFree) {
+                    finalPrice = ethers.utils.parseEther("0.0002").mul(qty);
+                } else if (qty > 1) {
+                    finalPrice = ethers.utils.parseEther("0.0002").mul(qty - 1);
+                }
+
+                const tx = await nftContract.mint(qty, { value: finalPrice });
+                await tx.wait();
+                alert("Mint Successful!");
+                updateSupply();
+                loadGallery();
+            } catch (e) {
+                console.error(e);
+                alert("Transaction failed or rejected.");
+            }
+        }
+
+        async function burnNFT() {
+            if (!nftContract) return alert("Please connect wallet first!");
+            const tokenId = document.getElementById("burnIdInput").value;
+            if(!tokenId) return alert("Please enter a valid Token ID");
+            try {
+                const tx = await nftContract.burn(tokenId);
+                await tx.wait();
+                alert(`Token #${tokenId} Successfully Burned!`);
+                loadGallery();
+            } catch (e) {
+                console.error(e);
+                alert("Burn transaction failed.");
+            }
+        }
+
+        async function loadGallery() {
+            const container = document.getElementById("galleryContainer");
+            container.innerHTML = ""; // Clear existing elements
+            try {
+                const tempProvider = new ethers.providers.JsonRpcProvider(alchemyUrl);
+                const tempContract = new ethers.Contract(contractAddress, contractABI, tempProvider);
+                const supply = await tempContract.totalSupply();
+                const total = Math.min(parseInt(supply.toString()), 24); // Show latest 24 minted tokens safely
+
+                for(let i = total; i > 0; i--) {
+                    try {
+                        const rawUri = await tempContract.tokenURI(i);
+                        const cleanJson = JSON.parse(atob(rawUri.split(",")[1]));
+                        
+                        const item = document.createElement("div");
+                        item.className = "bg-gray-900 border border-gray-700 flex flex-col justify-between items-center p-1 text-center";
+                        item.innerHTML = `
+                            <img src="${cleanJson.image}" class="w-full h-auto aspect-square object-cover" />
+                            <span class="text-sm text-white mt-1">#${i}</span>
+                        `;
+                        container.appendChild(item);
+                    } catch (err) {
+                        console.error(`Error loading metadata for token ${i}:`, err);
+                    }
+                }
+            } catch (e) {
+                console.error("Gallery failed to populate:", e);
+            }
+        }
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
