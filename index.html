@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VersePunkz - On-Chain NFT Minting & Burning</title>
+    <title>VersePunkz - Premium On-Chain NFT Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
@@ -12,22 +12,24 @@
 
     <style>
         body {
-            background-color: #708090; /* SlateGray */
+            background: radial-gradient(circle at center, #708090 0%, #475569 100%); /* Upgraded SlateGray Cyber Gradient */
             font-family: 'VT323', monospace;
             color: #00ffcc;
             image-rendering: pixelated;
+            overflow-x: hidden;
         }
         .cyber-border {
             border: 4px solid #00ffcc;
-            box-shadow: 4px 4px 0px #000;
+            box-shadow: 6px 6px 0px #000;
+            background: rgba(0, 0, 0, 0.9);
         }
         .btn-3d {
             position: relative;
-            background: #ff0055;
+            background: linear-gradient(135deg, #ff0055 0%, #cc0044 100%);
             color: #fff;
             border: 3px solid #000;
             box-shadow: 0 6px 0 #000;
-            transition: all 0.1s ease;
+            transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
         }
         .btn-3d:active {
@@ -35,13 +37,31 @@
             transform: translateY(4px);
         }
         .btn-connect {
-            background: #00ffcc;
+            background: linear-gradient(135deg, #00ffcc 0%, #00ccaa 100%);
             color: #000;
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #fff;
+        }
+        .btn-purple {
+            background: linear-gradient(135deg, #a855f7 0%, #6b21a8 100%);
+            color: #fff;
         }
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             gap: 12px;
+        }
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #00ffcc;
+            border-radius: 4px;
         }
         @media (max-width: 640px) {
             .gallery-grid {
@@ -50,93 +70,136 @@
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4 md:p-8 min-h-screen flex flex-col justify-between">
 
-    <nav class="max-w-6xl mx-auto flex flex-wrap justify-between items-center p-4 cyber-border bg-black mb-8">
-        <h1 class="text-4xl tracking-wider">VERSE PUNKZ</h1>
+    <nav class="max-w-6xl w-full mx-auto flex flex-wrap justify-between items-center p-4 cyber-border mb-8">
+        <h1 class="text-4xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-200">VERSE PUNKZ</h1>
         <button id="connectBtn" class="btn-3d btn-connect text-2xl px-6 py-1" onclick="connectWallet()">CONNECT WALLET</button>
     </nav>
 
-    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <main class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         
         <div class="flex flex-col gap-8">
             
-            <section class="p-6 bg-black cyber-border text-center">
-                <h2 class="text-4xl mb-2 text-white">PUBLIC MINT IS LIVE</h2>
-                <p class="text-2xl text-yellow-400 mb-4">1ST MINT IS TOTALLY FREE PER WALLET</p>
-                
-                <div class="text-3xl mb-6">
-                    MINTED: <span id="supplyCounter" class="text-white">LOADING...</span> / 10000
+            <section class="p-6 cyber-border text-center flex flex-col justify-between">
+                <div>
+                    <h2 class="text-4xl mb-2 text-white tracking-wide">PUBLIC MINT IS LIVE</h2>
+                    <p class="text-2xl text-yellow-400 mb-4">1ST MINT IS TOTALLY FREE PER WALLET</p>
+                    
+                    <div class="text-3xl mb-6 bg-gray-900/80 p-3 border-2 border-cyan-900">
+                        MINTED: <span id="supplyCounter" class="text-white">LOADING...</span> / 10000
+                    </div>
+
+                    <div class="flex justify-center items-center gap-4 mb-6 text-3xl">
+                        <button class="btn-3d px-5 py-1" onclick="updateQty(-1)">-</button>
+                        <span id="mintQty" class="text-white px-6 bg-gray-900 border border-gray-800 rounded">1</span>
+                        <button class="btn-3d px-5 py-1" onclick="updateQty(1)">+</button>
+                    </div>
                 </div>
 
-                <div class="flex justify-center items-center gap-4 mb-6 text-3xl">
-                    <button class="btn-3d px-4 py-1" onclick="updateQty(-1)">-</button>
-                    <span id="mintQty" class="text-white px-4">1</span>
-                    <button class="btn-3d px-4 py-1" onclick="updateQty(1)">+</button>
+                <div>
+                    <button class="btn-3d text-3xl w-full py-3 tracking-wider font-bold mb-2" onclick="mintNFT()">MINT NOW</button>
+                    <div class="text-xl text-gray-400">PRICE AFTER FREE MINT: 0.0001 ETH</div>
                 </div>
-
-                <button class="btn-3d text-3xl w-full py-2" onclick="mintNFT()">MINT NOW</button>
-                <div class="text-xl mt-2 text-gray-400">PRICE AFTER FREE MINT: 0.0002 ETH</div>
             </section>
 
-            <section class="p-6 bg-black cyber-border">
-                <h2 class="text-4xl text-center mb-4 text-white">BURN TO CLAIM TOKENS</h2>
+            <section class="p-6 cyber-border">
+                <h2 class="text-4xl text-center mb-4 text-white tracking-wide">BURN TO CLAIM TOKENS</h2>
                 <p class="text-2xl text-center text-gray-400 mb-6">BURN YOUR VERSE PUNKZ TO EARN FUTURE $VPUNKZ REWARDS</p>
                 
                 <div class="flex flex-col gap-4">
-                    <input type="number" id="burnIdInput" placeholder="ENTER NFT TOKEN ID" class="bg-gray-900 border-2 border-red-500 p-2 text-2xl text-white outline-none text-center">
-                    <button class="btn-3d bg-red-600 text-3xl py-2" onclick="burnNFT()">BURN NFT</button>
+                    <input type="number" id="burnIdInput" placeholder="ENTER NFT TOKEN ID" class="bg-gray-900 border-4 border-red-600 p-2 text-2xl text-white outline-none text-center font-bold">
+                    <button class="btn-3d bg-red-600 text-3xl py-2 font-bold tracking-wide" onclick="burnNFT()">BURN NFT</button>
                 </div>
 
-                <div class="mt-6 p-4 border-2 border-dashed border-gray-600 text-center">
-                    <button class="w-full text-2xl text-gray-500 cursor-not-allowed py-2" disabled>CLAIM $VPUNKZ (COMING SOON)</button>
+                <div class="mt-6 p-4 border-2 border-dashed border-gray-700 text-center bg-black/40">
+                    <button class="w-full text-2xl text-gray-600 cursor-not-allowed py-2" disabled>CLAIM $VPUNKZ (COMING SOON)</button>
                 </div>
             </section>
         </div>
 
         <div class="flex flex-col gap-8">
             
-            <section class="p-6 bg-black cyber-border flex-1">
-                <h2 class="text-4xl mb-4 text-white">COLLECTION GALLERY</h2>
-                <div id="galleryContainer" class="gallery-grid max-h-[450px] overflow-y-auto p-2 border-2 border-gray-800">
-                    </div>
+            <section class="p-6 cyber-border flex-1 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-4xl mb-4 text-white tracking-wide">COLLECTION GALLERY</h2>
+                    <div id="galleryContainer" class="gallery-grid max-h-[340px] overflow-y-auto p-2 border-2 border-gray-900 custom-scroll">
+                        </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mt-6 pt-4 border-t-2 border-cyan-900/50">
+                    <a href="https://etherscan.io/address/0x37da8d015C48a35c3FeE6A954020907AE5BB56A9" target="_blank" class="btn-3d btn-secondary text-2xl py-2 text-center font-bold tracking-wider">ETHERSCAN</a>
+                    <a href="https://opensea.io/collection/versepunkzs" target="_blank" class="btn-3d btn-purple text-2xl py-2 text-center font-bold tracking-wider">OPENSEA</a>
+                </div>
             </section>
         </div>
     </main>
 
-    <section class="max-w-6xl mx-auto mt-8 p-6 bg-black cyber-border">
-        <h2 class="text-4xl text-center mb-6 text-white">PROJECT ROADMAP</h2>
+    <section class="max-w-6xl w-full mx-auto p-6 cyber-border mb-4">
+        <h2 class="text-4xl text-center mb-6 text-white tracking-wide">PROJECT ROADMAP</h2>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xl">
-            <div class="p-4 border border-gray-800">
+            <div class="p-4 border border-gray-900 bg-black/40">
                 <div class="text-yellow-400 mb-2">STAGE 1</div>
-                <div>Smart contract deployment and structural testing on mainnet.</div>
+                <div class="text-gray-300">Smart contract deployment and structural testing on mainnet.</div>
             </div>
-            <div class="p-4 border border-gray-800">
+            <div class="p-4 border border-gray-900 bg-black/40">
                 <div class="text-yellow-400 mb-2">STAGE 2</div>
-                <div>Launch of the public minting portal with free allowance system.</div>
+                <div class="text-gray-300">Launch of the public minting portal with free allowance system.</div>
             </div>
-            <div class="p-4 border border-gray-800">
+            <div class="p-4 border border-gray-900 bg-black/40">
                 <div class="text-yellow-400 mb-2">STAGE 3</div>
-                <div>Activation of the burning engine for active community collectors.</div>
+                <div class="text-gray-300">Activation of the burning engine for active community collectors.</div>
             </div>
-            <div class="p-4 border border-gray-800">
+            <div class="p-4 border border-gray-900 bg-black/40">
                 <div class="text-yellow-400 mb-2">STAGE 4</div>
-                <div>Snapshot data processing and launch of $VPUNKZ liquidity token distribution.</div>
+                <div class="text-gray-300">Snapshot data processing and launch of $VPUNKZ liquidity token distribution.</div>
             </div>
         </div>
     </section>
 
     <script>
-        const contractAddress = "0x4B59F5Ca4bE16B14826D93f582a23f51011ADB99";
+        const contractAddress = "0x37da8d015C48a35c3FeE6A954020907AE5BB56A9";
         const alchemyUrl = "https://eth-mainnet.g.alchemy.com/v2/Jei0hdBnB76TsRhZsnx4e";
         
-        // Contract Minimal ABI compiled from Abi.txt
+        // Comprehensive Synchronized ABI Structure parsed completely from Abi (1).txt
         const contractABI = [
-            {"inputs":[{"internalType":"uint256","name":"quantity","type":"uint256"}],"name":"mint","outputs":[],"stateMutability":"payable","type":"function"},
+            {"inputs":[],"name":"adminMint","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
+            {"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"address","name":"owner","type":"address"}],"name":"ERC721IncorrectOwner","type":"error"},
+            {"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ERC721InsufficientApproval","type":"error"},
+            {"inputs":[{"internalType":"address","name":"approver","type":"address"}],"name":"ERC721InvalidApprover","type":"error"},
+            {"inputs":[{"internalType":"address","name":"operator","type":"address"}],"name":"ERC721InvalidOperator","type":"error"},
+            {"inputs":[{"internalType":"address","name":"receiver","type":"address"}],"name":"ERC721InvalidReceiver","type":"error"},
+            {"inputs":[{"internalType":"address","name":"sender","type":"address"}],"name":"ERC721InvalidSender","type":"error"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ERC721NonexistentToken","type":"error"},
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"OwnableInvalidOwner","type":"error"},
+            {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"OwnableUnauthorizedAccount","type":"error"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},
+            {"inputs":[{"internalType":"uint256","name":"quantity","type":"uint256"}],"name":"adminBatchMint","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
             {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"burn","outputs":[],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
             {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"claimedFree","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"quantity","type":"uint256"}],"name":"mint","outputs":[],"stateMutability":"payable","type":"function"},
+            {"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}
         ];
 
         let provider, signer, nftContract;
@@ -144,29 +207,24 @@
         function init() {
             updateSupply();
             loadGallery();
-            setInterval(updateSupply, 5000); // Poll supply data safely every 5 seconds
+            setInterval(updateSupply, 5000); // Poll tracking telemetry data safely every 5 seconds
         }
 
         // Web3 Connection Management (Multi-Wallet Extension Support Setup)
         async function connectWallet() {
-            // Priority list of various injected EIP-1193 Web3 providers
             let injectedProvider = null;
 
             if (window.ethereum) {
                 if (window.ethereum.providers && window.ethereum.providers.length > 0) {
-                    // Safe fallback routing to read whatever active extensions user interacts with first
                     injectedProvider = window.ethereum.providers[0];
                 } else {
                     injectedProvider = window.ethereum;
                 }
             } else if (window.okxwallet) {
-                // Route directly to OKX Wallet extension
                 injectedProvider = window.okxwallet;
             } else if (window.phantom && window.phantom.ethereum) {
-                // Route directly to Phantom extension
                 injectedProvider = window.phantom.ethereum;
             } else if (window.keplr && window.keplr.ethereum) {
-                // Route to Keplr EVM layer fallback if activated
                 injectedProvider = window.keplr.ethereum;
             }
 
@@ -176,7 +234,6 @@
             }
 
             try {
-                // Request account access from the correctly routed wallet extension
                 await injectedProvider.request({ method: 'eth_requestAccounts' });
                 
                 provider = new ethers.providers.Web3Provider(injectedProvider);
@@ -205,7 +262,7 @@
             let qty = parseInt(document.getElementById("mintQty").innerText);
             qty += val;
             if(qty < 1) qty = 1;
-            if(qty > 50) qty = 50; // Safety capping
+            if(qty > 50) qty = 50; 
             document.getElementById("mintQty").innerText = qty;
         }
 
@@ -218,9 +275,9 @@
                 
                 let finalPrice = ethers.utils.parseEther("0.0");
                 if (hasClaimedFree) {
-                    finalPrice = ethers.utils.parseEther("0.0002").mul(qty);
+                    finalPrice = ethers.utils.parseEther("0.0001").mul(qty);
                 } else if (qty > 1) {
-                    finalPrice = ethers.utils.parseEther("0.0002").mul(qty - 1);
+                    finalPrice = ethers.utils.parseEther("0.0001").mul(qty - 1);
                 }
 
                 const tx = await nftContract.mint(qty, { value: finalPrice });
@@ -251,12 +308,12 @@
 
         async function loadGallery() {
             const container = document.getElementById("galleryContainer");
-            container.innerHTML = ""; // Clear existing elements
+            container.innerHTML = ""; 
             try {
                 const tempProvider = new ethers.providers.JsonRpcProvider(alchemyUrl);
                 const tempContract = new ethers.Contract(contractAddress, contractABI, tempProvider);
                 const supply = await tempContract.totalSupply();
-                const total = Math.min(parseInt(supply.toString()), 24); // Show latest 24 minted tokens safely
+                const total = Math.min(parseInt(supply.toString()), 24); 
 
                 for(let i = total; i > 0; i--) {
                     try {
